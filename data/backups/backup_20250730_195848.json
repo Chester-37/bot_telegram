@@ -1,0 +1,217 @@
+{
+  "backup_date": "2025-07-30T19:58:48.421211",
+  "database_type": "SQLite",
+  "tables": {
+    "usuarios": [
+      {
+        "user_id": 195947658,
+        "username": "nico_",
+        "first_name": "Nico",
+        "role": "Admin"
+      },
+      {
+        "user_id": 1108686086,
+        "username": "tecnico_chemi",
+        "first_name": "Chemi",
+        "role": "Admin"
+      }
+    ],
+    "tipos_trabajo": [
+      {
+        "id": 1,
+        "nombre": "Albañilería",
+        "emoji": "🧱",
+        "activo": 1,
+        "orden": 1,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      },
+      {
+        "id": 2,
+        "nombre": "Electricidad",
+        "emoji": "⚡",
+        "activo": 1,
+        "orden": 2,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      },
+      {
+        "id": 3,
+        "nombre": "Fontanería",
+        "emoji": "🔧",
+        "activo": 1,
+        "orden": 3,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      },
+      {
+        "id": 4,
+        "nombre": "Pintura",
+        "emoji": "🎨",
+        "activo": 1,
+        "orden": 4,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      },
+      {
+        "id": 5,
+        "nombre": "Carpintería",
+        "emoji": "🪚",
+        "activo": 1,
+        "orden": 5,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      },
+      {
+        "id": 6,
+        "nombre": "Limpieza",
+        "emoji": "🧹",
+        "activo": 1,
+        "orden": 6,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      },
+      {
+        "id": 7,
+        "nombre": "Inspección",
+        "emoji": "🔍",
+        "activo": 1,
+        "orden": 7,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      },
+      {
+        "id": 8,
+        "nombre": "Otro",
+        "emoji": "📝",
+        "activo": 1,
+        "orden": 8,
+        "creado_por": null,
+        "fecha_creacion": "2025-07-30 17:35:12"
+      }
+    ],
+    "ubicaciones_config": [
+      {
+        "id": 1,
+        "tipo": "Edificio",
+        "nombre": "Edificio 1"
+      },
+      {
+        "id": 2,
+        "tipo": "Edificio",
+        "nombre": "Edificio 2"
+      },
+      {
+        "id": 3,
+        "tipo": "Edificio",
+        "nombre": "Edificio 3"
+      },
+      {
+        "id": 4,
+        "tipo": "Planta",
+        "nombre": "Planta 0"
+      },
+      {
+        "id": 5,
+        "tipo": "Planta",
+        "nombre": "Planta 1"
+      },
+      {
+        "id": 6,
+        "tipo": "Planta",
+        "nombre": "Planta 2"
+      },
+      {
+        "id": 7,
+        "tipo": "Planta",
+        "nombre": "Planta 3"
+      },
+      {
+        "id": 8,
+        "tipo": "Zona",
+        "nombre": "Zona 1"
+      },
+      {
+        "id": 9,
+        "tipo": "Zona",
+        "nombre": "Zona 2"
+      },
+      {
+        "id": 10,
+        "tipo": "Zona",
+        "nombre": "Zona 3"
+      },
+      {
+        "id": 11,
+        "tipo": "Zona",
+        "nombre": "Zona 4"
+      },
+      {
+        "id": 12,
+        "tipo": "Trabajo",
+        "nombre": "Trabajo 1"
+      },
+      {
+        "id": 13,
+        "tipo": "Trabajo",
+        "nombre": "Trabajo 2"
+      },
+      {
+        "id": 14,
+        "tipo": "Trabajo",
+        "nombre": "Trabajo 3"
+      }
+    ],
+    "avances": [
+      {
+        "id": 1,
+        "encargado_id": 195947658,
+        "ubicacion_edificio": "Edificio 1",
+        "ubicacion_zona": "Zona 1",
+        "ubicacion_planta": "Planta 1",
+        "ubicacion_nucleo": null,
+        "ubicacion_completa": "Edificio 1 > Planta 1 > Zona 1",
+        "trabajo": "Prueba de sistema",
+        "tipo_trabajo_id": 1,
+        "observaciones": "Avance de prueba del sistema nuevo",
+        "foto_path": null,
+        "estado": "Completado",
+        "fecha_registro": "2025-07-30 17:40:24",
+        "fecha_trabajo": "2025-07-30"
+      },
+      {
+        "id": 2,
+        "encargado_id": 195947658,
+        "ubicacion_edificio": "Edificio 1",
+        "ubicacion_zona": "Zona 1",
+        "ubicacion_planta": "Planta 1",
+        "ubicacion_nucleo": null,
+        "ubicacion_completa": "Edificio 1 > Planta 1 > Zona 1",
+        "trabajo": "Prueba de sistema",
+        "tipo_trabajo_id": 1,
+        "observaciones": "Avance de prueba del sistema nuevo",
+        "foto_path": null,
+        "estado": "Completado",
+        "fecha_registro": "2025-07-30 17:40:53",
+        "fecha_trabajo": "2025-07-30"
+      },
+      {
+        "id": 3,
+        "encargado_id": 195947658,
+        "ubicacion_edificio": "Edificio 1",
+        "ubicacion_zona": "Zona 1",
+        "ubicacion_planta": "Planta 1",
+        "ubicacion_nucleo": null,
+        "ubicacion_completa": "Edificio 1 > Planta 1 > Zona 1",
+        "trabajo": "Prueba de sistema",
+        "tipo_trabajo_id": 1,
+        "observaciones": "Avance de prueba del sistema nuevo",
+        "foto_path": null,
+        "estado": "Completado",
+        "fecha_registro": "2025-07-30 17:58:38",
+        "fecha_trabajo": "2025-07-30"
+      }
+    ],
+    "almacen_items": []
+  }
+}

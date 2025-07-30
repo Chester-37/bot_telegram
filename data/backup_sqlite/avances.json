@@ -1,0 +1,53 @@
+{
+  "columns": [
+    "id",
+    "encargado_id",
+    "ubicacion_edificio",
+    "ubicacion_zona",
+    "ubicacion_planta",
+    "ubicacion_nucleo",
+    "ubicacion_completa",
+    "trabajo",
+    "tipo_trabajo_id",
+    "observaciones",
+    "foto_path",
+    "estado",
+    "fecha_registro",
+    "fecha_trabajo"
+  ],
+  "rows": [
+    {
+      "id": 1,
+      "encargado_id": 195947658,
+      "ubicacion_edificio": "Edificio 1",
+      "ubicacion_zona": "Zona 1",
+      "ubicacion_planta": "Planta 1",
+      "ubicacion_nucleo": null,
+      "ubicacion_completa": "Edificio 1 > Planta 1 > Zona 1",
+      "trabajo": "Prueba de sistema",
+      "tipo_trabajo_id": 1,
+      "observaciones": "Avance de prueba del sistema nuevo",
+      "foto_path": null,
+      "estado": "Completado",
+      "fecha_registro": "2025-07-30 17:40:24",
+      "fecha_trabajo": "2025-07-30"
+    },
+    {
+      "id": 2,
+      "encargado_id": 195947658,
+      "ubicacion_edificio": "Edificio 1",
+      "ubicacion_zona": "Zona 1",
+      "ubicacion_planta": "Planta 1",
+      "ubicacion_nucleo": null,
+      "ubicacion_completa": "Edificio 1 > Planta 1 > Zona 1",
+      "trabajo": "Prueba de sistema",
+      "tipo_trabajo_id": 1,
+      "observaciones": "Avance de prueba del sistema nuevo",
+      "foto_path": null,
+      "estado": "Completado",
+      "fecha_registro": "2025-07-30 17:40:53",
+      "fecha_trabajo": "2025-07-30"
+    }
+  ],
+  "count": 2
+}

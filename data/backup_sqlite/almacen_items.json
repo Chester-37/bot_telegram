@@ -1,0 +1,11 @@
+{
+  "columns": [
+    "id",
+    "nombre",
+    "cantidad",
+    "descripcion",
+    "tipo"
+  ],
+  "rows": [],
+  "count": 0
+}

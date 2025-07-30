@@ -6,7 +6,7 @@ from telegram.ext import (
     ContextTypes, ConversationHandler, CallbackQueryHandler,
     MessageHandler, filters
 )
-import db_manager as db
+import db_adapter as db
 from bot_navigation import end_and_return_to_menu
 from .avances_keyboards import *
 from .avances_utils import escape, clean_text_input

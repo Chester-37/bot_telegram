@@ -100,7 +100,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         ])
     elif user_role == 'Admin':
         keyboard.extend([
-            [InlineKeyboardButton("👤 Gestionar Roles de Usuario", callback_data='manage_roles_start')]
+            [InlineKeyboardButton("👤 Gestionar Roles de Usuario", callback_data='manage_roles_start')],
+            [InlineKeyboardButton("🗄️ Administrar Base de Datos", callback_data='admin_management')]
         ])
     
     if not keyboard:

@@ -8,7 +8,7 @@ from telegram.ext import (
 )
 from datetime import datetime, date
 import os
-import db_manager as db
+import db_adapter as db_manager
 from bot_navigation import end_and_return_to_menu
 from calendar_helper import create_calendar, process_calendar_selection
 from .avances_keyboards import *
@@ -21,7 +21,7 @@ from reporter import send_report, format_user
     ESCRIBIENDO_TRABAJO, ESCRIBIENDO_TIPO_CUSTOM, SELECCIONANDO_FECHA,
     PROCESANDO_FOTO, ESCRIBIENDO_OBSERVACIONES, ESCRIBIENDO_INCIDENCIA,
     CONFIRMANDO_AVANCE, MOSTRANDO_OPCIONES
-) = range(10)
+) = range(11)
 
 async def start_avances_registro(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Menú principal de registro para encargados."""
@@ -29,7 +29,7 @@ async def start_avances_registro(update: Update, context: ContextTypes.DEFAULT_T
     await query.answer()
     
     user = update.effective_user
-    user_role = db.get_user_role(user.id)
+    user_role = db_manager.get_user_role(user.id)
     
     if not can_user_create_avances(user_role):
         await query.edit_message_text(
@@ -69,7 +69,7 @@ async def start_nuevo_avance(update: Update, context: ContextTypes.DEFAULT_TYPE)
     }
     
     # Obtener jerarquía de ubicaciones
-    jerarquia = db.get_jerarquia_ubicaciones()
+    jerarquia = db_manager.get_jerarquia_ubicaciones()
     
     if not jerarquia.get('Edificio'):
         await query.edit_message_text(
@@ -222,7 +222,7 @@ async def show_tipos_trabajo(update: Update, context: ContextTypes.DEFAULT_TYPE)
     """Muestra los tipos de trabajo disponibles."""
     query = update.callback_query if hasattr(update, 'callback_query') and update.callback_query else None
     
-    tipos_trabajo = db.get_tipos_trabajo_activos()
+    tipos_trabajo = db_manager.get_tipos_trabajo_activos()
     ubicacion_actual = build_ubicacion_string(context.user_data['current_avance']['ubicacion'])
     
     text = (
@@ -267,7 +267,7 @@ async def process_tipo_trabajo(update: Update, context: ContextTypes.DEFAULT_TYP
         else:
             # Tipo predefinido seleccionado
             tipo_id = int(query.data.replace('tipo_', ''))
-            tipos = db.get_tipos_trabajo_activos()
+            tipos = db_manager.get_tipos_trabajo_activos()
             tipo_seleccionado = next((t for t in tipos if t['id'] == tipo_id), None)
             
             if tipo_seleccionado:
@@ -607,7 +607,7 @@ async def save_avance_final(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         estado = 'Con Incidencia' if avance_data.get('tiene_incidencia') else 'Finalizado'
         
         # Crear avance en BD
-        avance_id = db.create_avance(
+        avance_id = db_manager.create_avance(
             encargado_id=user.id,
             ubicacion_completa=ubicacion_str,
             trabajo=avance_data['trabajo'],
@@ -624,7 +624,7 @@ async def save_avance_final(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         # Crear incidencia si existe
         incidencia_id = None
         if avance_data.get('tiene_incidencia'):
-            incidencia_id = db.create_incidencia(
+            incidencia_id = db_manager.create_incidencia(
                 avance_id=avance_id,
                 descripcion=avance_data['incidencia_desc'],
                 reporta_id=user.id

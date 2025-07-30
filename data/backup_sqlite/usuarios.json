@@ -1,0 +1,23 @@
+{
+  "columns": [
+    "user_id",
+    "username",
+    "first_name",
+    "role"
+  ],
+  "rows": [
+    {
+      "user_id": 195947658,
+      "username": "nico_",
+      "first_name": "Nico",
+      "role": "Admin"
+    },
+    {
+      "user_id": 1108686086,
+      "username": "tecnico_chemi",
+      "first_name": "Chemi",
+      "role": "Admin"
+    }
+  ],
+  "count": 2
+}

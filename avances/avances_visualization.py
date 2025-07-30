@@ -7,7 +7,7 @@ from telegram.ext import (
     MessageHandler, filters
 )
 from datetime import datetime, date, timedelta
-import db_manager as db
+import db_adapter as db_manager
 from bot_navigation import end_and_return_to_menu
 from .avances_keyboards import *
 from .avances_utils import *
@@ -24,7 +24,7 @@ async def start_avances_visualization(update: Update, context: ContextTypes.DEFA
     await query.answer()
     
     user = update.effective_user
-    user_role = db.get_user_role(user.id)
+    user_role = db_manager.get_user_role(user.id)
     
     if not can_user_view_all_avances(user_role):
         await query.edit_message_text(
@@ -57,7 +57,7 @@ async def show_avances_recent(update: Update, context: ContextTypes.DEFAULT_TYPE
     end_date = date.today()
     start_date = end_date - timedelta(days=7)
     
-    avances = db.get_avances_with_filters_extended(
+    avances = db_manager.get_avances_with_filters_extended(
         start_date=start_date,
         end_date=end_date
     )
@@ -129,7 +129,7 @@ async def show_avances_by_location(update: Update, context: ContextTypes.DEFAULT
     await query.answer()
     
     # Obtener jerarquía de ubicaciones
-    jerarquia = db.get_jerarquia_ubicaciones()
+    jerarquia = db_manager.get_jerarquia_ubicaciones()
     
     text = (
         "🏗️ *Avances por Ubicación*\n\n"
@@ -162,7 +162,7 @@ async def show_filter_edificio(update: Update, context: ContextTypes.DEFAULT_TYP
     query = update.callback_query
     await query.answer()
     
-    edificios = db.get_ubicaciones_by_tipo('Edificio')
+    edificios = db_manager.get_ubicaciones_by_tipo('Edificio')
     
     if not edificios:
         await query.edit_message_text(
@@ -199,7 +199,7 @@ async def apply_filter_edificio(update: Update, context: ContextTypes.DEFAULT_TY
     edificio_id = int(query.data.split('_')[3])
     
     # Obtener nombre del edificio
-    edificios = db.get_ubicaciones_by_tipo('Edificio')
+    edificios = db_manager.get_ubicaciones_by_tipo('Edificio')
     edificio = next((e for e in edificios if e['id'] == edificio_id), None)
     
     if not edificio:
@@ -212,7 +212,7 @@ async def apply_filter_edificio(update: Update, context: ContextTypes.DEFAULT_TY
     
     # Filtrar avances por edificio
     filtros = {'edificio': edificio['nombre']}
-    avances = db.get_avances_with_filters_extended(filters=filtros)
+    avances = db_manager.get_avances_with_filters_extended(filters=filtros)
     
     if not avances:
         await query.edit_message_text(
@@ -351,7 +351,7 @@ async def apply_date_filter(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         return SELECTING_DATE_RANGE
     
     # Obtener avances del periodo
-    avances = db.get_avances_with_filters_extended(
+    avances = db_manager.get_avances_with_filters_extended(
         start_date=start_date,
         end_date=end_date
     )

@@ -1,7 +1,9 @@
 # avances/avances_utils.py
 # Utilidades compartidas para el módulo de avances
 
+import db_adapter as db_manager
 from datetime import datetime, date
+import pytz
 from telegram.helpers import escape_markdown
 import re
 

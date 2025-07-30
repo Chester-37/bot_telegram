@@ -15,7 +15,7 @@ from rrhh.bot_rrhh import get_rrhh_conversation_handlers
 from almacen.bot_pedidos import get_pedidos_approval_handler, get_pedidos_preparation_handler, get_solicitar_material_handler
 from almacen.bot_almacen import get_almacen_conversation_handler, view_full_inventory, listar_material_en_obra
 from almacen.bot_averias import get_averias_conversation_handler  # <-- IMPORTACIÓN CORREGIDA Y AÑADIDA
-import db_manager as db
+import db_adapter as db
 from bot_navigation import start, exit_bot
 from prevencion.bot_prevencion import (
     get_prevencion_handlers,
@@ -27,6 +27,7 @@ from ordenes.bot_ordenes import get_ordenes_handlers, ver_foto_orden
 from usuarios.bot_usuarios import get_user_management_handlers, notify_admin_of_new_user
 from ubicaciones.bot_ubicaciones import get_ubicaciones_handler
 from bot_registro_personal import get_registro_personal_handler
+from admin_management import admin_management_handler
 from reporter import GROUP_CHAT_ID
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "7808980898:AAETMIUhwaarOWpx7KHFyN1cG3kJ7agivgs")
@@ -143,6 +144,9 @@ def main() -> None:
     
     for handler in get_user_management_handlers():
         application.add_handler(handler)
+    
+    # Handler de administración de base de datos
+    application.add_handler(admin_management_handler)
 
     # --- REGISTRO DE HANDLERS GLOBALES (COMANDOS Y BOTONES) ---
     application.add_handler(CommandHandler("start", start))

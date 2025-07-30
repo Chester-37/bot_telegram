@@ -1,0 +1,86 @@
+{
+  "columns": [
+    "id",
+    "nombre",
+    "emoji",
+    "activo",
+    "orden",
+    "creado_por",
+    "fecha_creacion"
+  ],
+  "rows": [
+    {
+      "id": 1,
+      "nombre": "Albañilería",
+      "emoji": "🧱",
+      "activo": 1,
+      "orden": 1,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    },
+    {
+      "id": 2,
+      "nombre": "Electricidad",
+      "emoji": "⚡",
+      "activo": 1,
+      "orden": 2,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    },
+    {
+      "id": 3,
+      "nombre": "Fontanería",
+      "emoji": "🔧",
+      "activo": 1,
+      "orden": 3,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    },
+    {
+      "id": 4,
+      "nombre": "Pintura",
+      "emoji": "🎨",
+      "activo": 1,
+      "orden": 4,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    },
+    {
+      "id": 5,
+      "nombre": "Carpintería",
+      "emoji": "🪚",
+      "activo": 1,
+      "orden": 5,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    },
+    {
+      "id": 6,
+      "nombre": "Limpieza",
+      "emoji": "🧹",
+      "activo": 1,
+      "orden": 6,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    },
+    {
+      "id": 7,
+      "nombre": "Inspección",
+      "emoji": "🔍",
+      "activo": 1,
+      "orden": 7,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    },
+    {
+      "id": 8,
+      "nombre": "Otro",
+      "emoji": "📝",
+      "activo": 1,
+      "orden": 8,
+      "creado_por": null,
+      "fecha_creacion": "2025-07-30 17:35:12"
+    }
+  ],
+  "count": 8
+}

@@ -1,0 +1,80 @@
+{
+  "columns": [
+    "id",
+    "tipo",
+    "nombre"
+  ],
+  "rows": [
+    {
+      "id": 1,
+      "tipo": "Edificio",
+      "nombre": "Edificio 1"
+    },
+    {
+      "id": 2,
+      "tipo": "Edificio",
+      "nombre": "Edificio 2"
+    },
+    {
+      "id": 3,
+      "tipo": "Edificio",
+      "nombre": "Edificio 3"
+    },
+    {
+      "id": 4,
+      "tipo": "Planta",
+      "nombre": "Planta 0"
+    },
+    {
+      "id": 5,
+      "tipo": "Planta",
+      "nombre": "Planta 1"
+    },
+    {
+      "id": 6,
+      "tipo": "Planta",
+      "nombre": "Planta 2"
+    },
+    {
+      "id": 7,
+      "tipo": "Planta",
+      "nombre": "Planta 3"
+    },
+    {
+      "id": 8,
+      "tipo": "Zona",
+      "nombre": "Zona 1"
+    },
+    {
+      "id": 9,
+      "tipo": "Zona",
+      "nombre": "Zona 2"
+    },
+    {
+      "id": 10,
+      "tipo": "Zona",
+      "nombre": "Zona 3"
+    },
+    {
+      "id": 11,
+      "tipo": "Zona",
+      "nombre": "Zona 4"
+    },
+    {
+      "id": 12,
+      "tipo": "Trabajo",
+      "nombre": "Trabajo 1"
+    },
+    {
+      "id": 13,
+      "tipo": "Trabajo",
+      "nombre": "Trabajo 2"
+    },
+    {
+      "id": 14,
+      "tipo": "Trabajo",
+      "nombre": "Trabajo 3"
+    }
+  ],
+  "count": 14
+}
