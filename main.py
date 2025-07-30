@@ -5,6 +5,9 @@ import pytz
 from datetime import time
 
 from bot_avances import get_avances_handlers, ver_foto_avance
+from avances.avances_management import get_avances_management_handler
+from avances.avances_registro import get_avances_registro_handler
+from avances.avances_visualization import get_avances_visualization_handler
 from almacen.bot_herramientas_incidencias import get_tool_incidencia_handler
 from bot_informes import get_informes_conversation_handler
 from bot_comentarios import get_comentario_conversation_handler
@@ -109,8 +112,14 @@ def main() -> None:
 
     # --- REGISTRO DE HANDLERS DE CONVERSACIÓN ---
     
+    # Handlers de avances (originales - mantener compatibilidad)
     for handler in get_avances_handlers():
         application.add_handler(handler)
+    
+    # Nuevos handlers de avances mejorados
+    application.add_handler(get_avances_management_handler())
+    application.add_handler(get_avances_registro_handler())
+    application.add_handler(get_avances_visualization_handler())
     
     application.add_handler(get_tool_incidencia_handler())
     application.add_handler(get_informes_conversation_handler())

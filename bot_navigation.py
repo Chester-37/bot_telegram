@@ -49,7 +49,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         keyboard.extend([
             [InlineKeyboardButton("🆕 Gestionar Órdenes", callback_data='gestionar_ordenes')],
             [InlineKeyboardButton("🆕 Crear Orden", callback_data='crear_orden')],
-            [InlineKeyboardButton("📝 Registrar Avance", callback_data='registrar_avance')],
+            [InlineKeyboardButton("� Registrar Avances", callback_data='registro_avances')],
             [InlineKeyboardButton("🛠️ Reportar Avería", callback_data='crear_incidencia')],
             [InlineKeyboardButton("📦 Solicitar Material al Almacén", callback_data='solicitar_material')],
             [InlineKeyboardButton("👤 Solicitar Personal", callback_data='rrhh_solicitar')],
@@ -59,7 +59,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         ])
     elif user_role == 'Tecnico':
         keyboard.extend([
-            [InlineKeyboardButton("📝 Registrar Avance", callback_data='registrar_avance')],
+            [InlineKeyboardButton("�️ Gestionar Avances", callback_data='manage_avances')],
+            [InlineKeyboardButton("�📝 Registrar Avance", callback_data='registrar_avance')],
             [InlineKeyboardButton("🛠️ Reportar Avería", callback_data='crear_incidencia')],
             [InlineKeyboardButton("🆕 Gestionar Órdenes", callback_data='gestionar_ordenes')],
             [InlineKeyboardButton("🆕 Crear Orden", callback_data='crear_orden')],
@@ -73,6 +74,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         ])
     elif user_role == 'Gerente':
         keyboard.extend([
+            [InlineKeyboardButton("📊 Ver Avances", callback_data='visualization_avances')],
             [InlineKeyboardButton("🆕 Gestionar Órdenes", callback_data='gestionar_ordenes')],
             [InlineKeyboardButton("🆕 Crear Orden", callback_data='crear_orden')],
             [InlineKeyboardButton("📦 Aprobar Pedidos de Material", callback_data='aprobar_pedidos')],

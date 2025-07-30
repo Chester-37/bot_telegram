@@ -300,7 +300,9 @@ async def save_avance(update: Update, context: ContextTypes.DEFAULT_TYPE, has_in
         avance_data['trabajo'],
         avance_data.get('foto_path'),
         'Con Incidencia' if has_incidencia else 'Finalizado',
-        avance_data['fecha_trabajo']
+        avance_data['fecha_trabajo'],
+        tipo_trabajo_id=None,  # Mantener compatibilidad con sistema anterior
+        observaciones=None     # No se usan observaciones en el sistema anterior
     )
 
     fecha_formateada = avance_data['fecha_trabajo'].strftime('%d/%m/%Y')

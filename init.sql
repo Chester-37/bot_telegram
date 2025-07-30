@@ -52,8 +52,22 @@ CREATE TABLE ubicaciones_config (
 );
 
 -- -----------------------------------------------------------------------------
+-- Tabla: tipos_trabajo
+-- Almacena los tipos de trabajo configurables por técnicos.
+-- -----------------------------------------------------------------------------
+CREATE TABLE tipos_trabajo (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL UNIQUE,
+    emoji VARCHAR(10) DEFAULT '🔧',
+    activo BOOLEAN DEFAULT TRUE,
+    orden INTEGER DEFAULT 0,
+    creado_por BIGINT REFERENCES usuarios(user_id),
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- -----------------------------------------------------------------------------
 -- Tabla: avances
--- Registra los avances de obra.
+-- Registra los avances de obra con jerarquía dinámica.
 -- -----------------------------------------------------------------------------
 CREATE TABLE avances (
     id SERIAL PRIMARY KEY,
@@ -68,6 +82,8 @@ CREATE TABLE avances (
     ubicacion_completa VARCHAR(1024) NOT NULL, 
     
     trabajo VARCHAR(255) NOT NULL,
+    tipo_trabajo_id INTEGER REFERENCES tipos_trabajo(id),
+    observaciones TEXT,
     foto_path VARCHAR(255),
     estado VARCHAR(50),
     fecha_registro TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -244,6 +260,16 @@ CREATE TABLE IF NOT EXISTS ordenes_trabajo (
     CONSTRAINT chk_orden_estado CHECK (estado IN ('Pendiente', 'Realizada'))
 );
 
+-- Insertar datos iniciales para tipos_trabajo
+INSERT INTO tipos_trabajo (nombre, emoji, orden) VALUES 
+('Albañilería', '🧱', 1),
+('Electricidad', '⚡', 2),
+('Fontanería', '🔧', 3),
+('Pintura', '🎨', 4),
+('Carpintería', '🪚', 5),
+('Limpieza', '🧹', 6),
+('Inspección', '🔍', 7),
+('Otro', '📝', 8);
 
 INSERT INTO ubicaciones_config (tipo, nombre) VALUES
 ('Edificio', 'Edificio 1'),

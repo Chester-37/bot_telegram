@@ -210,7 +210,7 @@ def update_almacen_item_quantity(item_id, nueva_cantidad):
 # =============================================================================
 # FUNCIONES DE AVANCES E INCIDENCIAS
 # =============================================================================
-def create_avance(encargado_id, ubicacion_completa, trabajo, foto_path, estado, fecha_trabajo):
+def create_avance(encargado_id, ubicacion_completa, trabajo, foto_path, estado, fecha_trabajo, tipo_trabajo_id=None, observaciones=None):
     """
     Inserta un nuevo avance en la base de datos, desglosando la ubicación en sus componentes
     y manteniendo la cadena completa.
@@ -232,12 +232,14 @@ def create_avance(encargado_id, ubicacion_completa, trabajo, foto_path, estado, 
                     ubicacion_nucleo,
                     ubicacion_completa,
                     trabajo,
+                    tipo_trabajo_id,
+                    observaciones,
                     foto_path,
                     estado,
                     fecha_registro,
                     fecha_trabajo
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
                 RETURNING id;
             """
             cur.execute(sql, (
@@ -248,6 +250,8 @@ def create_avance(encargado_id, ubicacion_completa, trabajo, foto_path, estado, 
                 nucleo,
                 ubicacion_completa,
                 trabajo,
+                tipo_trabajo_id,
+                observaciones,
                 foto_path,
                 estado,
                 fecha_trabajo
@@ -946,6 +950,226 @@ def get_distinct_ubicacion_tipos():
             # La consulta devuelve una lista de tuplas, la convertimos a una lista simple
             tipos = [row[0] for row in cur.fetchall()]
             return tipos
+    finally:
+        conn.close()
+
+# =============================================================================
+# FUNCIONES DE TIPOS DE TRABAJO
+# =============================================================================
+
+def get_tipos_trabajo_activos():
+    """Obtiene todos los tipos de trabajo activos ordenados por orden."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, nombre, emoji FROM tipos_trabajo WHERE activo = TRUE ORDER BY orden ASC;")
+            return [{"id": row[0], "nombre": row[1], "emoji": row[2]} for row in cur.fetchall()]
+    finally:
+        conn.close()
+
+def get_all_tipos_trabajo():
+    """Obtiene todos los tipos de trabajo (activos e inactivos) para gestión."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, nombre, emoji, activo, orden FROM tipos_trabajo ORDER BY orden ASC;")
+            return [{"id": row[0], "nombre": row[1], "emoji": row[2], "activo": row[3], "orden": row[4]} for row in cur.fetchall()]
+    finally:
+        conn.close()
+
+def add_tipo_trabajo(nombre, emoji="🔧", creado_por=None):
+    """Añade un nuevo tipo de trabajo."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            # Obtener el próximo orden
+            cur.execute("SELECT COALESCE(MAX(orden), 0) + 1 FROM tipos_trabajo;")
+            orden = cur.fetchone()[0]
+            
+            cur.execute(
+                "INSERT INTO tipos_trabajo (nombre, emoji, orden, creado_por) VALUES (%s, %s, %s, %s) RETURNING id;",
+                (nombre, emoji, orden, creado_por)
+            )
+            tipo_id = cur.fetchone()[0]
+            conn.commit()
+            return tipo_id
+    except psycopg2.IntegrityError:
+        conn.rollback()
+        return None
+    finally:
+        conn.close()
+
+def update_tipo_trabajo(tipo_id, nombre=None, emoji=None, activo=None):
+    """Actualiza un tipo de trabajo existente."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            updates = []
+            params = []
+            
+            if nombre is not None:
+                updates.append("nombre = %s")
+                params.append(nombre)
+            if emoji is not None:
+                updates.append("emoji = %s")
+                params.append(emoji)
+            if activo is not None:
+                updates.append("activo = %s")
+                params.append(activo)
+            
+            if updates:
+                params.append(tipo_id)
+                sql = f"UPDATE tipos_trabajo SET {', '.join(updates)} WHERE id = %s;"
+                cur.execute(sql, params)
+                conn.commit()
+                return True
+            return False
+    except psycopg2.IntegrityError:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+def delete_tipo_trabajo(tipo_id):
+    """Desactiva un tipo de trabajo (no lo elimina físicamente)."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE tipos_trabajo SET activo = FALSE WHERE id = %s;", (tipo_id,))
+            conn.commit()
+            return True
+    finally:
+        conn.close()
+
+def reorder_tipos_trabajo(tipo_ids_ordered):
+    """Reordena los tipos de trabajo según la lista proporcionada."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            for index, tipo_id in enumerate(tipo_ids_ordered, start=1):
+                cur.execute("UPDATE tipos_trabajo SET orden = %s WHERE id = %s;", (index, tipo_id))
+            conn.commit()
+            return True
+    finally:
+        conn.close()
+
+# =============================================================================
+# FUNCIONES DE AVANCES MEJORADAS
+# =============================================================================
+
+def get_avance_details_extended(avance_id):
+    """Obtiene los detalles completos de un avance incluyendo tipo de trabajo y observaciones."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            sql = """
+                SELECT a.id, a.ubicacion_completa, a.trabajo, a.foto_path, a.fecha_trabajo, 
+                       a.observaciones, a.estado, u.first_name,
+                       tt.nombre as tipo_trabajo_nombre, tt.emoji as tipo_trabajo_emoji
+                FROM avances a
+                JOIN usuarios u ON a.encargado_id = u.user_id
+                LEFT JOIN tipos_trabajo tt ON a.tipo_trabajo_id = tt.id
+                WHERE a.id = %s;
+            """
+            cur.execute(sql, (avance_id,))
+            res = cur.fetchone()
+            if not res:
+                return None
+            return {
+                "id": res[0], "ubicacion": res[1], "trabajo": res[2], 
+                "foto_path": res[3], "fecha_trabajo": res[4], "observaciones": res[5],
+                "estado": res[6], "encargado_name": res[7],
+                "tipo_trabajo": res[8], "tipo_trabajo_emoji": res[9]
+            }
+    finally:
+        conn.close()
+
+def get_jerarquia_ubicaciones():
+    """Obtiene la estructura jerárquica de ubicaciones organizadas por tipo."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            # Obtener tipos en orden preferido
+            tipos_ordenados = ['Edificio', 'Zona', 'Planta', 'Trabajo']
+            jerarquia = {}
+            
+            for tipo in tipos_ordenados:
+                cur.execute("SELECT id, nombre FROM ubicaciones_config WHERE tipo = %s ORDER BY nombre;", (tipo,))
+                jerarquia[tipo] = [{"id": row[0], "nombre": row[1]} for row in cur.fetchall()]
+            
+            # Agregar tipos adicionales que no están en el orden predefinido
+            cur.execute("SELECT DISTINCT tipo FROM ubicaciones_config WHERE tipo NOT IN %s;", (tuple(tipos_ordenados),))
+            for row in cur.fetchall():
+                tipo = row[0]
+                cur.execute("SELECT id, nombre FROM ubicaciones_config WHERE tipo = %s ORDER BY nombre;", (tipo,))
+                jerarquia[tipo] = [{"id": row[0], "nombre": row[1]} for row in cur.fetchall()]
+            
+            return jerarquia
+    finally:
+        conn.close()
+
+def get_avances_with_filters_extended(filters=None, start_date=None, end_date=None, user_id=None, estados=None):
+    """Obtiene avances con filtros extendidos incluyendo tipos de trabajo."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            base_sql = """
+                SELECT a.id, a.ubicacion_completa, a.trabajo, a.estado, a.fecha_trabajo, 
+                       a.observaciones, u.first_name, u.username,
+                       tt.nombre as tipo_trabajo, tt.emoji as tipo_trabajo_emoji
+                FROM avances a
+                JOIN usuarios u ON a.encargado_id = u.user_id
+                LEFT JOIN tipos_trabajo tt ON a.tipo_trabajo_id = tt.id
+            """
+            where_clauses = []
+            params = []
+
+            # Filtros de ubicación
+            if filters:
+                pattern_parts = []
+                filter_keys_ordered = ['edificio', 'zona', 'planta', 'trabajo']
+                for key in filter_keys_ordered:
+                    if filters.get(key):
+                        pattern_parts.append(filters.get(key))
+                    else:
+                        break
+                
+                if pattern_parts:
+                    like_pattern = " / ".join(pattern_parts) + "%"
+                    where_clauses.append("a.ubicacion_completa LIKE %s")
+                    params.append(like_pattern)
+
+            # Filtro de fechas
+            if start_date and end_date:
+                where_clauses.append("a.fecha_trabajo BETWEEN %s AND %s")
+                params.extend([start_date, end_date])
+
+            # Filtro de usuario
+            if user_id:
+                where_clauses.append("a.encargado_id = %s")
+                params.append(user_id)
+
+            # Filtro de estados
+            if estados:
+                where_clauses.append("a.estado = ANY(%s)")
+                params.append(estados)
+
+            if where_clauses:
+                base_sql += " WHERE " + " AND ".join(where_clauses)
+            
+            base_sql += " ORDER BY a.fecha_trabajo DESC, a.id DESC;"
+            
+            cur.execute(base_sql, tuple(params))
+            
+            avances = []
+            for row in cur.fetchall():
+                avances.append({
+                    "id": row[0], "ubicacion": row[1], "trabajo": row[2],
+                    "estado": row[3], "fecha": row[4], "observaciones": row[5],
+                    "encargado_nombre": row[6], "encargado_username": row[7],
+                    "tipo_trabajo": row[8], "tipo_trabajo_emoji": row[9]
+                })
+            return avances
     finally:
         conn.close()
 
