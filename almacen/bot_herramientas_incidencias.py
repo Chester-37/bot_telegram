@@ -1,7 +1,7 @@
 # almacen/bot_herramientas_incidencias.py
 import os
 from datetime import datetime
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ContextTypes,
     ConversationHandler,
@@ -13,9 +13,7 @@ import db_manager as db
 from bot_navigation import end_and_return_to_menu, start
 from reporter import send_report, escape, format_user
 from almacen.keyboards import get_cancel_keyboard, get_nav_keyboard
-# from almacen.error_handling import log_and_notify_error  # Opcional: para manejo centralizado de errores
 
-# Estados (puedes cambiar el rango si quieres evitar solapamientos)
 SELECTING_TOOL, AWAITING_DESCRIPTION, AWAITING_PHOTO = range(20, 23)
 ITEMS_PER_PAGE = 5
 
@@ -58,7 +56,6 @@ async def show_tool_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if pagination_buttons:
         keyboard.append(pagination_buttons)
     keyboard.append([InlineKeyboardButton("❌ Cancelar", callback_data="cancel_conversation")])
-    
     message_text = f"Selecciona la herramienta averiada (Página {page + 1}/{total_pages}):"
     await query.edit_message_text(text=message_text, reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -135,10 +132,8 @@ async def save_and_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("Ver y Resolver", callback_data=f'resolve_{incidencia_id}')]]
     if data.get('foto_path'):
         keyboard[0].append(InlineKeyboardButton("Ver Foto", callback_data=f'ver_foto_incidencia_{incidencia_id}'))
-    
     for tecnico in tecnicos:
         await context.bot.send_message(tecnico['id'], texto_notificacion, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='MarkdownV2')
-    
     context.user_data.clear()
 
 def get_tool_incidencia_handler():
@@ -153,6 +148,11 @@ def get_tool_incidencia_handler():
             AWAITING_PHOTO: [
                 CallbackQueryHandler(get_photo, pattern='^photo_'),
                 MessageHandler(filters.PHOTO, get_photo)
+            ],
+        },
+        fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
+        map_to_parent={ConversationHandler.END: ConversationHandler.END}
+    )
             ],
         },
         fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],

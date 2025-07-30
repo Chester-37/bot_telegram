@@ -144,7 +144,3 @@ def get_almacen_conversation_handler():
         map_to_parent={ConversationHandler.END: ConversationHandler.END},
         allow_reentry=True
     )
-
-# Alias para handlers standalone
-view_full_inventory = view_full_inventory
-listar_material_en_obra = listar_material_en_obra

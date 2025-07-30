@@ -1,6 +1,6 @@
 # almacen/bot_pedidos.py
 
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ContextTypes,
     ConversationHandler,
@@ -12,10 +12,7 @@ import db_manager as db
 from bot_navigation import end_and_return_to_menu
 from reporter import send_report, escape, format_user
 from almacen.keyboards import get_cancel_keyboard, get_nav_keyboard
-# from almacen.error_handling import log_and_notify_error  # Opcional: para manejo centralizado de errores
 
-# --- MEJORES PRÁCTICAS: Estados unificados en un solo rango ---
-# Esto previene colisiones entre los diferentes ConversationHandlers de este archivo.
 (
     # Estados para la conversación de SOLICITUD de material
     SELECTING_ITEM_TYPE, SELECTING_ITEM, AWAITING_QUANTITY, 
@@ -456,6 +453,9 @@ def get_pedidos_preparation_handler():
                 CallbackQueryHandler(mark_as_ready, pattern='^prep_ready$'),
                 CallbackQueryHandler(show_approved_requests, pattern='^back_to_prep_list$')
             ]
+        },
+        fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
+    )
         },
         fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
     )

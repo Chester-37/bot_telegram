@@ -20,11 +20,6 @@ from reporter import send_report, escape, format_user
 AWAITING_MACHINE_NAME, AWAITING_BREAKDOWN_DESC, AWAITING_BREAKDOWN_PHOTO = range(3)
 SELECTING_AVERIA_TYPE, LISTING_BREAKDOWNS, VIEWING_BREAKDOWN_DETAILS, AWAITING_DECISION_NOTES = range(3, 7)
 
-# --- Helpers de Teclado ---
-# Puedes importar los teclados comunes si lo deseas, pero aquí los dejamos locales para independencia.
-# Si quieres unificar, descomenta las siguientes líneas y elimina las funciones locales:
-# from almacen.keyboards import get_cancel_keyboard, get_nav_keyboard
-
 def get_cancel_keyboard():
     return InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cancelar", callback_data="cancel_conversation")]])
 
@@ -32,18 +27,15 @@ def get_nav_keyboard():
     return InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ Menú Principal", callback_data="back_to_main_menu")]])
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Cancela la operación y vuelve directamente al menú principal."""
     query = update.callback_query
     if query:
         await query.answer("Operación cancelada.")
     else:
         await update.message.reply_text("Operación cancelada.")
-    
     group_chat_id = context.user_data.get('group_chat_id')
     context.user_data.clear()
     if group_chat_id:
         context.user_data['group_chat_id'] = group_chat_id
-        
     await start(update, context)
     return ConversationHandler.END
 
@@ -101,10 +93,7 @@ async def save_breakdown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = context.user_data['new_breakdown']
     message_source = update.callback_query.message if update.callback_query else update.message
     averia_id = db.create_averia(user.id, data['maquina'], data['descripcion'], data.get('foto_path'))
-    
     await message_source.reply_text(f"✅ Avería registrada con ID #{averia_id}. Notificando a los técnicos...", reply_markup=get_nav_keyboard())
-
-    # Reporte para el grupo
     report_text = (
         f"‼️ *Reporte: Nueva Avería de Maquinaria* ‼️\n\n"
         f"*ID Avería:* `{averia_id}`\n"
@@ -113,8 +102,6 @@ async def save_breakdown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"*Descripción:* {escape(data['descripcion'])}"
     )
     await send_report(context, report_text)
-
-    # Notificación a los técnicos
     ids_tecnicos = db.get_users_by_role('Tecnico')
     texto_notificacion = (f"‼️ *Nueva Avería Reportada por {format_user(user)}* ‼️\n\n"
                           f"🔩 *Máquina:* {escape(data['maquina'])}\n"
@@ -122,7 +109,6 @@ async def save_breakdown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("Gestionar Avería", callback_data='gestionar_averias')]]
     for tecnico in ids_tecnicos:
         await context.bot.send_message(chat_id=tecnico['id'], text=texto_notificacion, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='MarkdownV2')
-    
     context.user_data.clear()
 
 # =============================================================================
@@ -139,25 +125,19 @@ async def averias_menu_tecnico(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.edit_message_text("🛠️ *Gestión de Averías de Maquinaria*\n\nElige una opción:", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='Markdown')
     return SELECTING_AVERIA_TYPE
 
-# ### CORREGIDO: La función ahora acepta un argumento opcional para ser llamada internamente ###
 async def show_breakdowns_by_type(update: Update, context: ContextTypes.DEFAULT_TYPE, list_type: str = None) -> int:
     query = update.callback_query
-    
     tipo = list_type if list_type else query.data.split('_')[1]
     context.user_data['current_list_type'] = tipo
-    
     if query:
         await query.answer()
-
     estados = ['Pendiente'] if tipo == 'Pendiente' else ['En Reparacion', 'Dada de Baja']
     texto_vacio = "✅ No hay averías pendientes." if tipo == 'Pendiente' else "✅ No hay averías gestionadas."
     texto_titulo = "Selecciona una avería para gestionar:" if tipo == 'Pendiente' else "Selecciona una avería para ver sus detalles:"
-    
     averias = db.get_averias_by_estado(estados)
     if not averias:
         await query.edit_message_text(texto_vacio, reply_markup=get_nav_keyboard())
         return ConversationHandler.END
-
     keyboard = [[InlineKeyboardButton(f"ID #{a['id']}: {a['maquina']}", callback_data=f"view_averia_{a['id']}")] for a in averias]
     keyboard.append([InlineKeyboardButton("<< Volver", callback_data="back_to_averia_menu")])
     await query.edit_message_text(texto_titulo, reply_markup=InlineKeyboardMarkup(keyboard))
@@ -172,7 +152,6 @@ async def view_breakdown_details(update: Update, context: ContextTypes.DEFAULT_T
     if not details:
         await query.edit_message_text("❌ Error: No se encontró la avería.", reply_markup=get_nav_keyboard())
         return ConversationHandler.END
-
     texto = (f"🔩 *Detalle de Avería #{details['id']}*\n\n"
              f"▪️ *Reporta:* {escape_markdown(details['reporta_name'], 2)}\n"
              f"▪️ *Máquina:* {escape_markdown(details['maquina'], 2)}\n"
@@ -191,7 +170,6 @@ async def view_breakdown_details(update: Update, context: ContextTypes.DEFAULT_T
                   f"▪️ *Gestionada por:* {escape_markdown(details.get('tecnico_name', 'N/A'), 2)}\n"
                   f"▪️ *Fecha Decisión:* {details['fecha_decision']}\n"
                   f"▪️ *Notas del Técnico:* _{escape_markdown(details.get('notas_tecnico', 'Sin notas.'), 2)}_")
-    
     if details['has_foto']:
         keyboard.append([InlineKeyboardButton("Ver Foto", callback_data=f"ver_foto_averia_{details['id']}")])
     keyboard.append([InlineKeyboardButton("<< Volver a la lista", callback_data="back_to_list")])
@@ -213,13 +191,10 @@ async def save_decision(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     tecnico = update.effective_user
     db.decide_averia(averia_id, tecnico.id, decision, notes)
     await update.message.reply_text(f"✅ Decisión guardada para la avería #{averia_id}.", reply_markup=get_nav_keyboard())
-    
     details = db.get_averia_details(averia_id)
     if not details:
         context.user_data.clear()
         return ConversationHandler.END
-
-    # Reporte para el grupo
     emoji = {'En Reparacion': '✅', 'Dada de Baja': '❌'}.get(decision, '🗣️')
     report_text = (
         f"{emoji} *Reporte: Decisión sobre Avería* {emoji}\n\n"
@@ -230,20 +205,15 @@ async def save_decision(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         f"*Notas:* {escape(notes)}"
     )
     await send_report(context, report_text)
-
-    # Notificación para el que reportó
     if details.get('reporta_id'):
         texto_notif = (f"🗣️ *Actualización sobre tu reporte de avería #{averia_id}* \\({escape(details['maquina'])}\\)\n\n"
                        f"El técnico {format_user(tecnico)} ha decidido: *{escape(decision)}*\\.\n\n"
                        f"📝 *Notas:* _{escape(notes)}_")
         await context.bot.send_message(chat_id=details['reporta_id'], text=texto_notif, parse_mode='MarkdownV2')
-    
     context.user_data.clear()
     return ConversationHandler.END
 
-# ### CORREGIDO: La función ahora llama a show_breakdowns_by_type correctamente ###
 async def back_to_previous_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Vuelve a la vista de lista de averías llamando a la función correcta."""
     list_type = context.user_data.get('current_list_type', 'Pendiente')
     return await show_breakdowns_by_type(update, context, list_type=list_type)
 
@@ -256,6 +226,36 @@ def get_averias_conversation_handler():
         states={
             AWAITING_MACHINE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_machine_name)],
             AWAITING_BREAKDOWN_DESC: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_breakdown_desc)],
+            AWAITING_BREAKDOWN_PHOTO: [
+                CallbackQueryHandler(get_breakdown_photo, pattern='^breakdown_'),
+                MessageHandler(filters.PHOTO, get_breakdown_photo)
+            ],
+        },
+        fallbacks=[
+            CallbackQueryHandler(cancel, pattern='^cancel_conversation$'),
+            CallbackQueryHandler(end_and_return_to_menu, pattern='^back_to_main_menu$')
+        ],
+    )
+    manage_handler = ConversationHandler(
+        entry_points=[CallbackQueryHandler(averias_menu_tecnico, pattern='^gestionar_averias$')],
+        states={
+            SELECTING_AVERIA_TYPE: [CallbackQueryHandler(show_breakdowns_by_type, pattern='^manage_')],
+            LISTING_BREAKDOWNS: [
+                CallbackQueryHandler(view_breakdown_details, pattern='^view_averia_'),
+                CallbackQueryHandler(averias_menu_tecnico, pattern='^back_to_averia_menu$')
+            ],
+            VIEWING_BREAKDOWN_DETAILS: [
+                CallbackQueryHandler(ask_decision_notes, pattern='^decide_'),
+                CallbackQueryHandler(back_to_previous_list, pattern='^back_to_list$')
+            ],
+            AWAITING_DECISION_NOTES: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_decision)],
+        },
+        fallbacks=[
+            CallbackQueryHandler(cancel, pattern='^cancel_conversation$'),
+            CallbackQueryHandler(end_and_return_to_menu, pattern='^back_to_main_menu$')
+        ],
+    )
+    return report_handler, manage_handler
             AWAITING_BREAKDOWN_PHOTO: [CallbackQueryHandler(get_breakdown_photo, pattern='^breakdown_'), MessageHandler(filters.PHOTO, get_breakdown_photo)],
         },
         fallbacks=[

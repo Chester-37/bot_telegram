@@ -17,16 +17,16 @@ async def log_and_notify_error(update: Update, context: ContextTypes.DEFAULT_TYP
         logger.error("No se pudo enviar el mensaje de error al usuario: %s", e)
 
 def log_warning(message: str):
-    logger.warning(message)
-
-def log_info(message: str):
-    logger.info(message)
     """
     Loguea una advertencia.
     """
     logger.warning(message)
 
 def log_info(message: str):
+    """
+    Loguea información.
+    """
+    logger.info(message)
     """
     Loguea información.
     """
