@@ -456,12 +456,3 @@ def get_pedidos_preparation_handler():
         },
         fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
     )
-        },
-        fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
-    )
-                CallbackQueryHandler(mark_as_ready, pattern='^prep_ready$'),
-                CallbackQueryHandler(show_approved_requests, pattern='^back_to_prep_list$')
-            ]
-        },
-        fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
-    )
