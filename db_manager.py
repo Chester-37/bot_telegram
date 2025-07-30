@@ -8,11 +8,11 @@ DB_PASS = "--"
 DB_HOST = "localhost"
 DB_PORT = "5432" 
 """ # Añadido puerto 5433 Nico
-DB_NAME = os.getenv("DB_NAME", "telegrambot")
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASS = os.getenv("DB_PASS", "contraseña CAMBIAR") #TODO
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432") # Añadido puerto 5433 Nico
+DB_NAME = os.getenv("POSTGRES_DB", "telegrambot")
+DB_USER = os.getenv("POSTGRES_USER", "postgres")
+DB_PASS = os.getenv("POSTGRES_PASSWORD", "contraseña CAMBIAR") #TODO
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_PORT = os.getenv("POSTGRES_PORT", "5432") # Añadido puerto 5433 Nico
 
 def get_connection():
     """Establece y devuelve una conexión con la base de datos."""

@@ -18,7 +18,7 @@ def create_database_and_migrate():
         'password': 'postgres',  # Cambiar por la contraseña real
     }
     
-    target_db = 'bot_telegram_db'
+    target_db = os.getenv('POSTGRES_DB', 'bot_telegram_db')
     
     try:
         print("🔄 Conectando a PostgreSQL...")

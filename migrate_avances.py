@@ -6,11 +6,11 @@ import os
 from datetime import datetime
 
 # Configuración de base de datos
-DB_NAME = os.getenv("DB_NAME", "telegrambot")
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASS = os.getenv("DB_PASS", "contraseña CAMBIAR")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("POSTGRES_DB", "telegrambot")
+DB_USER = os.getenv("POSTGRES_USER", "postgres")
+DB_PASS = os.getenv("POSTGRES_PASSWORD", "contraseña CAMBIAR")
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
 def get_connection():
     """Establece conexión con la base de datos."""
