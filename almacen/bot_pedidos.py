@@ -94,7 +94,7 @@ async def show_material_page(update: Update, context: ContextTypes.DEFAULT_TYPE)
     page = context.user_data.get('current_page', 0)
     item_type = context.user_data.get('current_item_type')
     
-    materials, total_pages = db.get_almacen_items_paginated([item_type], page, ITEMS_PER_PAGE)
+    materials, total_pages = db.get_almacen_items_paginated(item_type, page, ITEMS_PER_PAGE)
 
     if not materials and page == 0:
         await query.edit_message_text(f"❌ No hay '{escape(item_type)}' en el inventario\\.", reply_markup=get_cancel_keyboard("Pedido"), parse_mode='MarkdownV2')

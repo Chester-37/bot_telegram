@@ -256,30 +256,3 @@ def get_averias_conversation_handler():
         ],
     )
     return report_handler, manage_handler
-            AWAITING_BREAKDOWN_PHOTO: [CallbackQueryHandler(get_breakdown_photo, pattern='^breakdown_'), MessageHandler(filters.PHOTO, get_breakdown_photo)],
-        },
-        fallbacks=[
-            CallbackQueryHandler(cancel, pattern='^cancel_conversation$'),
-            CallbackQueryHandler(end_and_return_to_menu, pattern='^back_to_main_menu$')
-        ],
-    )
-    manage_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(averias_menu_tecnico, pattern='^gestionar_averias$')],
-        states={
-            SELECTING_AVERIA_TYPE: [CallbackQueryHandler(show_breakdowns_by_type, pattern='^manage_')],
-            LISTING_BREAKDOWNS: [
-                CallbackQueryHandler(view_breakdown_details, pattern='^view_averia_'),
-                CallbackQueryHandler(averias_menu_tecnico, pattern='^back_to_averia_menu$')
-            ],
-            VIEWING_BREAKDOWN_DETAILS: [
-                CallbackQueryHandler(ask_decision_notes, pattern='^decide_'),
-                CallbackQueryHandler(back_to_previous_list, pattern='^back_to_list$') # Usa la función corregida
-            ],
-            AWAITING_DECISION_NOTES: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_decision)],
-        },
-        fallbacks=[
-            CallbackQueryHandler(cancel, pattern='^cancel_conversation$'),
-            CallbackQueryHandler(end_and_return_to_menu, pattern='^back_to_main_menu$')
-        ],
-    )
-    return report_handler, manage_handler

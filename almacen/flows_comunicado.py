@@ -52,9 +52,3 @@ def get_comunicado_handler():
         map_to_parent={ConversationHandler.END: ConversationHandler.END},
         allow_reentry=True,
     )
-            CallbackQueryHandler(start_comunicado, pattern="^cancel_almacen$"),
-            CallbackQueryHandler(end_and_return_to_menu, pattern="^back_to_main_menu$"),
-        ],
-        map_to_parent={ConversationHandler.END: ConversationHandler.END},
-        allow_reentry=True,
-    )

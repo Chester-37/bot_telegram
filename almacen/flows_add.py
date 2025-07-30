@@ -88,5 +88,3 @@ async def save_item(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data.clear()
     await query.edit_message_text("✅ ¡Artículo guardado con éxito!")
     return await end_and_return_to_menu(update, context)
-    await query.edit_message_text("✅ ¡Artículo guardado con éxito!")
-    return await end_and_return_to_menu(update, context)

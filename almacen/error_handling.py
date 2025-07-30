@@ -27,7 +27,3 @@ def log_info(message: str):
     Loguea información.
     """
     logger.info(message)
-    """
-    Loguea información.
-    """
-    logger.info(message)

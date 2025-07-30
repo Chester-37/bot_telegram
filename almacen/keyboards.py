@@ -67,15 +67,6 @@ def get_confirm_delete_keyboard(item_id):
     ])
 
 def get_pagination_keyboard(page, total_pages):
-    buttons = []
-    if page > 0:
-        buttons.append(InlineKeyboardButton("⬅️ Anterior", callback_data="view_page_prev"))
-    if page < total_pages - 1:
-        buttons.append(InlineKeyboardButton("Siguiente ➡️", callback_data="view_page_next"))
-    return InlineKeyboardMarkup([buttons]) if buttons else None
-    ])
-
-def get_pagination_keyboard(page, total_pages):
     """Teclado de paginación para la lista de artículos."""
     buttons = []
     if page > 0:

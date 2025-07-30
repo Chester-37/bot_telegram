@@ -143,21 +143,9 @@ def get_tool_incidencia_handler():
             SELECTING_TOOL: [
                 CallbackQueryHandler(change_page, pattern='^page_'),
                 CallbackQueryHandler(tool_selected, pattern='^tool_'),
-            },
+            ],
             AWAITING_DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_description)],
             AWAITING_PHOTO: [
-                CallbackQueryHandler(get_photo, pattern='^photo_'),
-                MessageHandler(filters.PHOTO, get_photo)
-            ],
-        },
-        fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
-        map_to_parent={ConversationHandler.END: ConversationHandler.END}
-    )
-            ],
-        },
-        fallbacks=[CallbackQueryHandler(cancel, pattern='^cancel_conversation$')],
-        map_to_parent={ConversationHandler.END: ConversationHandler.END}
-    )
                 CallbackQueryHandler(get_photo, pattern='^photo_'),
                 MessageHandler(filters.PHOTO, get_photo)
             ],

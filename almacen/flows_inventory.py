@@ -301,4 +301,4 @@ async def listar_material_en_obra(update: Update, context: ContextTypes.DEFAULT_
     await query.edit_message_text(
         message_text, parse_mode="MarkdownV2", reply_markup=get_nav_keyboard()
     )
-    )
+    return ConversationHandler.END
