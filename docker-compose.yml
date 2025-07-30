@@ -1,29 +1,61 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database optimizado para Synology
   db:
-    image: postgres:15
-    container_name: postgres-db
-    restart: always
+    image: postgres:15-alpine  # Versión alpine más ligera para Synology
+    container_name: bot-telegram-postgres
+    restart: unless-stopped  # Mejor opción para Synology DSM
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql   # <--- Añadido aquí
+      # IMPORTANTE: Cambiar estas rutas por las de tu Synology
+      # Ejemplo: /volume1/docker/bot_telegram/postgres_data
+      - /volume1/docker/bot_telegram/postgres_data:/var/lib/postgresql/data
+      - /volume1/docker/bot_telegram/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5433:5432" # El puerto 5433 está siendo utilizado por otra aplicación
+      - "5432:5432"  # Puerto estándar PostgreSQL
+    networks:
+      - bot_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # Bot de Telegram
   telegram-bot:
-    build: .
-    container_name: telegram-bot
-    restart: always
-    env_file:
-      - .env
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: bot-telegram-app
+    restart: unless-stopped
+    environment:
+      # Variables de entorno para PostgreSQL en Synology
+      USE_SQLITE: "false"
+      POSTGRES_HOST: "db"
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BOT_TOKEN: ${BOT_TOKEN}
+      TZ: "Europe/Madrid"  # Ajustar zona horaria
     volumes:
-      - ./data:/app/data
+      # IMPORTANTE: Cambiar estas rutas por las de tu Synology
+      # Ejemplo: /volume1/docker/bot_telegram/data
+      - /volume1/docker/bot_telegram/data:/app/data
+      - /volume1/docker/bot_telegram/logs:/app/logs
     working_dir: /app
     command: ["python", "main.py"]
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - bot_network
+
+networks:
+  bot_network:
+    driver: bridge

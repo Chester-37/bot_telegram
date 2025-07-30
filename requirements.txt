@@ -1,4 +1,28 @@
-python-telegram-bot[job-queue]
-psycopg2-binary
-fpdf
-pytz
+# =============================================================================
+# Dependencias para Bot Telegram - Synology DS1520+
+# =============================================================================
+
+# Bot de Telegram con todas las funcionalidades
+python-telegram-bot[job-queue]==20.8
+
+# Base de datos PostgreSQL
+psycopg2-binary==2.9.9
+
+# Generación de PDFs
+fpdf==2.5.7
+
+# Manejo de zonas horarias
+pytz==2023.3
+
+# Monitoreo del sistema (para healthcheck)
+psutil==5.9.8
+
+# Manejo de variables de entorno
+python-dotenv==1.0.0
+
+# Logging avanzado
+structlog==23.2.0
+
+# Utilidades adicionales
+requests==2.31.0
+pillow==10.1.0

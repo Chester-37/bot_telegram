@@ -1,37 +1,92 @@
 """
 Adaptador de base de datos que permite usar SQLite o PostgreSQL
-según la disponibilidad.
+según la disponibilidad. Optimizado para Synology DS1520+ / DSM 7.2
 """
 import os
 import sqlite3
+import time
+import logging
 from datetime import datetime
 from pathlib import Path
 
-# Configuración de base de datos
-USE_SQLITE = os.getenv("USE_SQLITE", "true").lower() == "true"
+# Configuración de logging para Synology
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/app/logs/db_adapter.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Configuración de base de datos con variables de entorno para Synology
+USE_SQLITE = os.getenv("USE_SQLITE", "false").lower() == "true"  # PostgreSQL por defecto para Synology
 SQLITE_PATH = Path(__file__).parent / 'data' / 'bot_telegram.db'
 
 if USE_SQLITE:
-    print(f"🔄 Usando SQLite: {SQLITE_PATH}")
+    logger.info(f"🔄 Usando SQLite: {SQLITE_PATH}")
 else:
-    print("🔄 Usando PostgreSQL")
-    import psycopg2
+    logger.info("🔄 Usando PostgreSQL para Synology DS1520+")
+    try:
+        import psycopg2
+        import psycopg2.extras
+    except ImportError:
+        logger.error("❌ psycopg2 no está instalado. Instalar con: pip install psycopg2-binary")
+        raise
 
-# Configuración PostgreSQL (fallback)
+# Configuración PostgreSQL optimizada para Synology
 DB_NAME = os.getenv("POSTGRES_DB", "bot_telegram_db")
-DB_USER = os.getenv("POSTGRES_USER", "postgres")
+DB_USER = os.getenv("POSTGRES_USER", "bot_admin")
 DB_PASS = os.getenv("POSTGRES_PASSWORD", "postgres")
-DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_HOST = os.getenv("POSTGRES_HOST", "db")  # Nombre del servicio en docker-compose
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
-def get_connection():
-    """Establece y devuelve una conexión con la base de datos."""
+# Configuración de conexión para Synology (más robusta)
+CONNECTION_POOL_SIZE = int(os.getenv("POOL_SIZE", "10"))
+MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "20"))
+CONNECTION_TIMEOUT = int(os.getenv("CONNECTION_TIMEOUT", "30"))
+
+def get_connection(retries=3, delay=5):
+    """
+    Establece y devuelve una conexión con la base de datos.
+    Incluye reintentos para mayor robustez en Synology.
+    """
     if USE_SQLITE:
-        conn = sqlite3.connect(str(SQLITE_PATH))
-        conn.row_factory = sqlite3.Row  # Para acceder por nombre de columna
-        return conn
+        try:
+            # Asegurar que el directorio existe
+            SQLITE_PATH.parent.mkdir(parents=True, exist_ok=True)
+            conn = sqlite3.connect(str(SQLITE_PATH))
+            conn.row_factory = sqlite3.Row  # Para acceder por nombre de columna
+            return conn
+        except Exception as e:
+            logger.error(f"❌ Error conectando a SQLite: {e}")
+            raise
     else:
-        return psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
+        # PostgreSQL con reintentos para Synology
+        for attempt in range(retries):
+            try:
+                conn = psycopg2.connect(
+                    dbname=DB_NAME, 
+                    user=DB_USER, 
+                    password=DB_PASS, 
+                    host=DB_HOST, 
+                    port=DB_PORT,
+                    connect_timeout=CONNECTION_TIMEOUT
+                )
+                logger.info(f"✅ Conectado a PostgreSQL (intento {attempt + 1})")
+                return conn
+            except psycopg2.OperationalError as e:
+                logger.warning(f"⚠️  Intento {attempt + 1} fallido: {e}")
+                if attempt < retries - 1:
+                    logger.info(f"⏳ Reintentando en {delay} segundos...")
+                    time.sleep(delay)
+                else:
+                    logger.error(f"❌ No se pudo conectar a PostgreSQL después de {retries} intentos")
+                    raise
+            except Exception as e:
+                logger.error(f"❌ Error inesperado conectando a PostgreSQL: {e}")
+                raise
 
 def execute_query(query, params=None, fetch_one=False, fetch_all=False):
     """Ejecuta una consulta adaptada para SQLite/PostgreSQL"""

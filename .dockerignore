@@ -1,10 +1,98 @@
-# .dockerignore
+# =============================================================================
+# .dockerignore para Synology DS1520+ - Optimización de imagen
+# =============================================================================
 
-__pycache__/
-*.pyc
-.git/
+# Archivos de documentación
+*.md
+README*
+CHANGELOG*
+LICENSE
+*.txt
+!requirements.txt
+
+# Archivos de git
+.git
 .gitignore
+.gitattributes
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Entornos virtuales
+.venv
+env/
 venv/
-.venv/
-Dockerfile
-.dockerignore
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Datos locales (se montan como volúmenes)
+data/
+postgres_data/
+backups/
+
+# Archivos temporales
+.tmp/
+*.tmp
+*.temp
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de testing local
+test_*.py
+*_test.py
+tests/
+
+# Scripts de desarrollo
+dev_*.py
+debug_*.py
+
+# Archivos de configuración local
+.env.local
+.env.development
+config.local.*
+
+# Archivos de backup
+*.bak
+*.backup
+*.sql
+
+# Archivos grandes que no son necesarios
+*.zip
+*.tar.gz
+*.rar
+
+# Cache de Docker
+Dockerfile.dev
