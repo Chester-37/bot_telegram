@@ -126,4 +126,3 @@ async def end_and_return_to_menu(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data.clear()
     await start(update, context)
     return ConversationHandler.END
-    return ConversationHandler.END
