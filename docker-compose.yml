@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql   # <--- Añadido aquí
+    ports:
+      - "5433:5432" # El puerto 5433 está siendo utilizado por otra aplicación
+
+  telegram-bot:
+    build: .
+    container_name: telegram-bot
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    working_dir: /app
+    command: ["python", "main.py"]
+    depends_on:
+      - db
